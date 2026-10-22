@@ -1,0 +1,20 @@
+{
+  "cost_unit": "per unit of demand",
+  "locations": ["Location 1", "Location 2", "Location 3"],
+  "model_cost": 4.98,
+  "baseline_cost": 8.87,
+  "oracle_cost": 4.57,
+  "stock": {"model": [20, 28, 30], "baseline": [29, 30, 32]},
+  "cost_breakdown": {
+    "model":    {"holding": 2.10, "unmet_demand": 1.10, "transport": 1.78},
+    "baseline": {"holding": 4.35, "unmet_demand": 3.62, "transport": 0.90}
+  },
+  "shipments": [[20, 0, 0], [4, 22, 0], [0, 3, 27]],
+  "assumptions": {
+    "locations": 3,
+    "past_periods": 30,
+    "holding_cost": "1.00",
+    "unmet_cost": "9.00 (90% service target)",
+    "transport_cost": "1.00 to 5.00, by distance"
+  }
+}
