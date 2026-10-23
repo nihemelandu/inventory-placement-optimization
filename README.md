@@ -6,28 +6,30 @@
 
 ## The problem
 
-A regional manager places stock at each location ahead of a seasonal sale of fixed length. There is no replenishment during the sale, and demand at each location is not known in advance. Three costs pull against each other:
+A regional manager must determine how to allocate inventory across multiple locations before a fixed-length seasonal sale, when demand at each location is uncertain and replenishment is not possible. The manager must also develop a fulfillment policy to determine which location should serve each customer's demand, allowing inventory to be shared across locations when appropriate. The objective is to minimize the expected total cost of leftover inventory, unmet demand, and transportation while balancing the risks of overstocking and stockouts.
 
-- **Holding:** stock left over at the end of the sale.
+The three costs are:
+
+- **Leftover inventory:** stock left over at the end of the sale.
 - **Unmet demand:** customers who cannot be served.
-- **Transport:** shipping from a location farther from the customer.
+- **Transportation:** shipping from a location farther from the customer.
 
-The obvious approach is to let each location stock for its own customers. That leaves some locations with surplus while others run out, even though a surplus unit could often serve a neighbouring region at a modest shipping cost. The question is how much of that sharing is worth doing, and how much stock to place where, before anyone knows what demand will be.
+The obvious approach is to let each location stock for its own customers. That leaves some locations with surplus while others run out, even though a surplus unit could often serve a neighbouring region at a modest transportation cost. The question is how much of that sharing is worth doing, and how much stock to place where, before anyone knows what demand will be.
 
 ## Why it matters
 
 - **Stock is committed before demand is seen.** A wrong placement cannot be fixed during the sale.
 - **Errors are costly in both directions.** Too much stock is paid for and unsold; too little means lost sales.
-- **Sharing stock is a trade-off, not a free win.** Extra shipping has to be weighed against the holding and shortage costs it avoids.
+- **Sharing stock is a trade-off, not a free win.** Extra transportation has to be weighed against the leftover inventory and shortage costs it avoids.
 
 ## Approach
 
-A two-stage stochastic linear program, solved with sample average approximation.
+A fulfillment policy is developed using a two-stage stochastic programming model, solved with sample average approximation.
 
 1. **Stage 1** chooses the stock to hold at each location, before demand is known.
 2. **Stage 2** decides which location ships to which customer region, once demand is known. Any location with stock can serve any region (virtual pooling).
 
-The objective is the average total cost (holding + unmet demand + transport) across the demand scenarios. The model is written in Python with Pyomo and solved with the open-source HiGHS solver.
+The objective is the average total cost (leftover inventory + unmet demand + transportation) across the demand scenarios. The model is written in Python with Pyomo and solved with the open-source HiGHS solver.
 
 **Baseline:** each location stocks only for its own customers, at the level that minimizes that location's own cost.
 
@@ -41,11 +43,11 @@ Success targets, set before the runs: at least 30% below the independent-locatio
 |---|---|---|
 | Cost per unit of demand | **4.98** | 8.87 |
 | Total stock held (units) | 78 | 91 |
-| Holding cost | 2.10 | 4.35 |
+| Leftover inventory cost | 2.10 | 4.35 |
 | Unmet demand cost | 1.10 | 3.62 |
-| Transport cost | 1.78 | 0.90 |
+| Transportation cost | 1.78 | 0.90 |
 
-The plan costs less because sharing stock cuts holding and unmet-demand costs by more than the extra shipping adds.
+The plan costs less because sharing stock cuts leftover inventory and unmet-demand costs by more than the extra transportation adds.
 
 | Location | Stock to hold (model) | Stock to hold (baseline) |
 |---|---|---|
@@ -93,9 +95,9 @@ Eight scenarios give a plan within 1.3% of the full-set cost. Four scenarios giv
 |---|---|
 | Locations | 3 |
 | Past sales periods used | 30 |
-| Cost to hold one unit | 1.00 |
+| Cost of one unit of leftover inventory | 1.00 |
 | Cost of one unit not delivered | 9.00 (implies a 90% service target) |
-| Cost to ship one unit | 1.00 to 5.00, by distance |
+| Cost to transport one unit | 1.00 to 5.00, by distance |
 
 ## Limits of these results
 
